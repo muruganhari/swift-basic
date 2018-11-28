@@ -24,6 +24,51 @@ class APIRequestManager {
             })
         }
     }
+    func postMethod(url: String, param :Dictionary<String , AnyObject> , completion : @escaping(_ success : Bool , _ jsonObject : ImageModel?) -> ())
+    {
+        print("Url:----->\(url)")
+        print("Params:----->\(param)")
+        post(request: clientURLRequestPostMethod(path: url, params: param)) { (success, object) in
+            DispatchQueue.main.async(execute: { () -> Void in
+                if success {
+                    completion(true, ImageModel.convertData(data: object as! Data))
+                }else{
+                    completion(false, ImageModel.convertData(data: object as! Data))
+                }
+            })
+        }
+    }
+    private func post(request: NSMutableURLRequest, completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+        dataTask(request: request, method: "POST", completion: completion)
+    }
+    private func clientURLRequestPostMethod(path: String, params: Dictionary<String , AnyObject>? = nil) -> NSMutableURLRequest {
+        if params != nil {
+            var paramString = ""
+            var index : Int = 0
+            for (key, value) in params! {
+                index = index + 1
+                let escapedKey = key
+                let escapedValue = value
+                if params!.count == index{
+                    paramString += "\(escapedKey)=\(escapedValue)"
+                }else{
+                    paramString += "\(escapedKey)=\(escapedValue)&"
+                }
+            }
+            return self.setRequestDatas(strUrl: baseURL+path, params: params as Any)
+        }
+        
+        return NSMutableURLRequest()
+    }
+    func setRequestDatas(strUrl: String, params: Any)->NSMutableURLRequest{
+        print("Url:----->\(strUrl)")
+        print("Params:----->\(params)")
+        let request = NSMutableURLRequest(url: NSURL(string: strUrl)! as URL)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try! JSONSerialization.data(withJSONObject: params as Any, options: [])
+        return request
+    }
+    
     private func clientURLRequestGetMethod(path: String) -> NSMutableURLRequest {
         let urlWithParams: NSString = baseURL+path as NSString
         let urlStr  = urlWithParams.addingPercentEscapes(using: String.Encoding.utf8.rawValue)!

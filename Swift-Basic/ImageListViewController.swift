@@ -131,3 +131,14 @@ class imageCell: UICollectionViewCell{
 
 
 
+/*
+ kfAPI.termsCondition(url: url, param:[:]) { [weak self] (success, termsModel) in
+ if success{
+ if termsModel?.responseObject?.count != 0{
+ self?.termsDetails = termsModel?.responseObject![0]
+ self?.setDescription()
+ }
+ }
+ self?.didEndLoadingContent()
+ }
+ */
